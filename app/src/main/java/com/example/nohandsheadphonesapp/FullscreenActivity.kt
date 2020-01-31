@@ -1,5 +1,6 @@
 package com.example.nohandsheadphonesapp
 
+import ConnectThread
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -11,6 +12,12 @@ import android.widget.Button
 import androidx.appcompat.app.AppCompatActivity
 import java.io.IOException
 import java.util.*
+import androidx.core.app.ComponentActivity
+import androidx.core.app.ComponentActivity.ExtraData
+import androidx.core.content.ContextCompat.getSystemService
+import android.icu.lang.UCharacter.GraphemeClusterBreak.T
+
+
 
 
 /**
@@ -52,9 +59,9 @@ class FullscreenActivity : AppCompatActivity() {
             pairedDevices?.forEach { device ->
                 val deviceName = device.name
                 val deviceHardwareAddress = device.address // MAC address
-                Log.v("Appinfo", device.name)
+                Log.v("Appinfo", device.name + " " + device.address + " " + device.type.toString())
 
-                if (device.name == "HUAWEI P8 lite"){
+                if (device.name == "Galaxy J5 2017"){
                     myDevice = device
                     Log.v("Appinfo", myDevice?.name)
                 }
@@ -67,29 +74,21 @@ class FullscreenActivity : AppCompatActivity() {
 
             val MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
 
-//
-//            val clazz: Class<*> = tmp.getRemoteDevice().getClass()
-//            val paramTypes = arrayOf<Class<*>>(Integer.TYPE)
-//
-//            val m: Method = clazz.getMethod("createRfcommSocket", *paramTypes)
-//            val params = arrayOf<Any>(Integer.valueOf(1))
-//
-//            fallbackSocket = m.invoke(tmp.getRemoteDevice(), params) as BluetoothSocket
+            val connThread = ConnectThread(myDevice)
 
-            val mySocket = myDevice?.createInsecureRfcommSocketToServiceRecord(MY_UUID)
+//            val mySocket = myDevice?.createInsecureRfcommSocketToServiceRecord(MY_UUID)
 
             try {
 
 //                var mySocket = myDevice.getMethod("createRfcommSocket", arrayOf<Class<*>?>(Int::class.javaPrimitiveType)).invoke(myDevice, 1) as BluetoothSocket
-                mySocket?.connect()
+//                mySocket?.connect()
 
-                mySocket?.connect()
-                var inputStream = mySocket?.inputStream
-                var outputStream = mySocket?.outputStream
-
-                var bts: ByteArray = ByteArray(1024)
-                inputStream?.read(bts)
-
+//                var inputStream = mySocket?.inputStream
+//                var outputStream = mySocket?.outputStream
+//
+//                var bts: ByteArray = ByteArray(1024)
+//                inputStream?.read(bts)
+                connThread.run()
             }
             catch (e: IOException){
                 Log.d("Appinfo", e.toString())
