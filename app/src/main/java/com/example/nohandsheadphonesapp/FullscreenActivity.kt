@@ -12,6 +12,7 @@ import android.view.View.*
 import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import java.io.IOException
 import java.io.InputStream
@@ -53,10 +54,11 @@ class FullscreenActivity : AppCompatActivity() {
             // Huawei - 5C:A8:6A:89:1E:70
             // J5 - BC:54:51:07:62:C5
             // Note 9 - F4:C2:48:E7:63:B6
+            // Arduino - 98:d3:51:fd:de:73
 
-            var myDevice: BluetoothDevice? = bluetoothAdapter?.getRemoteDevice("F4:C2:48:E7:63:B6")
+            var myDevice: BluetoothDevice? = bluetoothAdapter?.getRemoteDevice("98:D3:51:FD:DE:73")
 
-            Log.i(TAG, myDevice?.name)
+//            Log.i(TAG, myDevice?.name)
 //            val pairedDevices: Set<BluetoothDevice>? = bluetoothAdapter?.bondedDevices
 //            pairedDevices?.forEach { device ->
 //                Log.v(TAG, device.name + " " + device.address)
@@ -68,22 +70,27 @@ class FullscreenActivity : AppCompatActivity() {
 //            }
 
             try {
-                var MY_UUID = UUID.fromString("0000112f-0000-1000-8000-00805f9b34fb")
+                //0000112f-0000-1000-8000-00805f9b34fb
+                var MY_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB")
 
                 try {
                     var mySocket = myDevice?.createInsecureRfcommSocketToServiceRecord(MY_UUID)
 
                     if(mySocket?.isConnected != true) {
                         mySocket!!.connect()
+                        Toast.makeText(this, "Connected to " + mySocket.remoteDevice.address + " " + mySocket.remoteDevice.name, Toast.LENGTH_SHORT).show()
                     }
 
                     inputStream = mySocket.inputStream
                     outputStream = mySocket.outputStream
                     connThread = ConnectThread(mySocket, mainHandler, recievedText)
                     connThread!!.start()
+//                    outputStream?.write(1)
 
                 } catch (e: IOException) {
                     Log.d(TAG, "Could not close connection:" + e.toString())
+                    Toast.makeText(this, "Fail", Toast.LENGTH_SHORT).show()
+
                 }
             }
             catch (e: Exception){
@@ -94,9 +101,10 @@ class FullscreenActivity : AppCompatActivity() {
         }
 
         sendButton.setOnClickListener {
-            if(connected){
-                outputStream?.write(sendMessageEditText.text.toString().toByteArray())
-            }
+            Toast.makeText(this, outputStream.toString(), Toast.LENGTH_SHORT).show()
+            val str = sendMessageEditText.text.toString()
+
+            outputStream?.write(sendMessageEditText.text.toString().toByteArray())
         }
     }
 }

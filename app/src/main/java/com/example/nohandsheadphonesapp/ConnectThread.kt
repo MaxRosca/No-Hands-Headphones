@@ -18,25 +18,32 @@ class ConnectThread(private val mmSocket: BluetoothSocket?, val handler: Handler
             var outputStream = mmSocket?.outputStream
             val mmBuffer: ByteArray = ByteArray(1024)
             var numBytes: Int
+            var b: Byte
+
+            inputStream?.skip(inputStream.available().toLong())
+            try {
 
             while (true) {
                 Log.v("sfas", "gi")
 
-                try {
-                    numBytes = inputStream!!.read(mmBuffer)
+                b = inputStream!!.read().toByte()
 //                    Log.v(TAG, "HI")
-                } catch (e: IOException) {
-                    Log.v(TAG, "Input stream was disconnected", e)
-                    break
-                }
 
                 handler.post {
-                    val s = String(mmBuffer, 0, numBytes)
+//                    val s = String(mmBuffer, 0, numBytes)
 
-                    textV.text = s
+                    textV.text = b.toChar().toString()
+                }
+
+                if(b.toChar().toString() == "4"){
+                    break
                 }
             }
 
+            } catch (e: IOException) {
+                Log.v(TAG, "Input stream was disconnected", e)
+
+            }
         } catch (connectException: IOException) {
             Log.d("CONNECTTHREAD", "Could not close connection:" + connectException.toString())
             // Unable to connect; close the socket and get out
